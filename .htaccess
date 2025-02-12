@@ -1,0 +1,20 @@
+RewriteEngine On
+RewriteBase /
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+RewriteCond %{HTTP:Origin} ^(https?://.+)$ [NC]
+RewriteRule .* - [E=ORIGIN:%{HTTP:Origin}]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+<IfModule mod_headers.c>
+    <IfModule mod_setenvif.c>
+        SetEnvIfNoCase ^Authorization$ "^(.+)$" AUTHORIZATION=$1
+        Header set Access-Control-Allow-Origin "%{ORIGIN}e" env=ORIGIN
+        Header set Access-Control-Allow-Credentials "true"
+        Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Header set Access-Control-Allow-Headers "Content-Type, X-Requested-With, Authorization, Origin"
+    </IfModule>
+</IfModule>
